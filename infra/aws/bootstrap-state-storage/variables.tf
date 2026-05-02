@@ -6,7 +6,7 @@ variable "region"{
 variable "project"{
     type = string
     description = "Terraform state resources"
-    default = "State-resources-management"
+    default = "sue"
 }
 locals{
     name = var.project
