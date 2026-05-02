@@ -1,48 +1,92 @@
-data "aws_availability_zones" "available" {
-  state = "available"
+resource "aws_vpc" "sue-vpc" {
+  cidr_block = var.vpc_cidr
+  tags = {
+    name = "sue-vpc"
+  }
 }
-
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
-
-  name = "${var.cluster_name}-vpc"
-  cidr = var.vpc_cidr
-
-  azs = [
-    data.aws_availability_zones.available.names[0],
-    data.aws_availability_zones.available.names[1],
-    data.aws_availability_zones.available.names[2],
-  ]
-
-  # Public subnets — one per AZ
-  # Used for load balancers only, nodes never go here
-  public_subnets = [
-    "10.0.2.0/24",   # AZ 3 — e.g. us-east-1c
-  ]
-
-  # Private subnets — one per AZ
-  # All EKS nodes (CPU + GPU) live here
-  private_subnets = [
-    "10.0.12.0/24",  # AZ 3 — e.g. us-east-1c
-  ]
-
-  enable_nat_gateway   = true
-  single_nat_gateway   = true   # one NAT GW for all private subnets
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-
-  # Required for the AWS Load Balancer Controller
-  # to know which subnets to place public-facing LBs in
-  public_subnet_tags = {
-    "kubernetes.io/role/elb" = "1"
+resource "aws_internet_gateway" "sue-igw" {
+  vpc_id = aws_vpc.sue-vpc.id
+  tags = {
+    name = "sue-igw"
   }
-
-  # Required for the AWS Load Balancer Controller
-  # to know which subnets to place internal LBs in
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = "1"
+}
+//subnets- I have created 2 private and 2 public subnets
+resource "aws_subnet" "sue-subnet-private-1" {
+  vpc_id = aws_vpc.sue-vpc.id
+  cidr_block = var.cidr_private_subnet_1
+  availability_zone = var.az_a
+  tags = {
+    name = "sue-subnet-private-1"
   }
-
-  tags = var.tags
+}
+resource "aws_subnet" "sue-subnet-private-2" {
+  vpc_id = aws_vpc.sue-vpc.id
+  cidr_block = var.cidr_private_subnet_2
+  availability_zone = var.az_b
+  tags = {
+    name = "sue-subnet-private-2"
+  }
+}
+resource "aws_subnet" "sue-subnet-public-1" {
+  vpc_id = aws_vpc.sue-vpc.id
+  cidr_block = var.cidr_public_subnet_1
+  availability_zone = var.az_a
+  tags = {
+    name = "sue-subnet-public-1"
+  }
+}
+resource "aws_subnet" "sue-subnet-public-2" {
+  vpc_id = aws_vpc.sue-vpc.id
+  cidr_block = var.cidr_public_subnet_2
+  availability_zone = var.az_b
+  tags = {
+    name = "sue-subnet-public-2"
+  }
+}
+//route table that either directs to the vpc cidr or to the internet gateway
+resource "aws_route_table" "sue-public-rt" {
+  vpc_id = aws_vpc.sue-vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.sue-igw.id
+  }
+  tags = {
+    name = "sue-public-rt"
+  }
+}
+//assigning route table with the public subnets
+resource "aws_route_table_association" "sue-rta-public-1" {
+  subnet_id = aws_subnet.sue-subnet-public-1.id
+  route_table_id = aws_route_table.sue-public-rt.id
+}
+resource "aws_route_table_association" "sue-rta-public-2" {
+  subnet_id = aws_subnet.sue-subnet-public-2.id
+  route_table_id = aws_route_table.sue-public-rt.id
+}
+resource "aws_nat_gateway" "sue-nat-gw" {
+  allocation_id = aws_eip.sue-nat-eip.id
+  subnet_id = aws_subnet.sue-subnet-public-1.id
+  tags = {
+    name = "sue-nat-gw"
+  }
+}
+//this route table uses the nat gateway to route traffic to the internet and is associated with the private subnets
+resource "aws_route_table" "sue-private-rt" {
+  vpc_id = aws_vpc.sue-vpc.id
+  route{
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.sue-nat-gw.id
+  }
+  tags = {
+    name = "sue-private-rt"
+  }
+}
+//same thing, assigning the private route table to the private subnets
+resource "aws_route_table_association" "sue-rta-private-1" {
+  subnet_id = aws_subnet.sue-subnet-private-1.id
+  route_table_id = aws_route_table.sue-private-rt.id
+}
+resource "aws_route_table_association" "sue-rta-private-2" {
+  subnet_id = aws_subnet.sue-subnet-private-2.id
+  route_table_id = aws_route_table.sue-private-rt.id  
 }
