@@ -28,6 +28,17 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION || 'eu-central-1' }}
 
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.30.0'
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+          --region ${{ secrets.AWS_REGION }} \
+          --name qwen-cluster
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
