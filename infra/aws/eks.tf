@@ -114,3 +114,27 @@ output "cluster_name" {
   description = "EKS cluster name"
   value = aws_eks_cluster.sue_eks.name
 }
+//this part is necessary because it creates a connection between the AWS IAM and the Kubernetes
+//Since by default EKS creats a cluster from the IAM entity that creates it, that being the GitHub role I created
+//So I had to manually attach our roles to the cluster so we could connect to it
+resource "kubernetes_config_map_v1_data" "aws_auth" {
+  metadata {
+    name = "aws-auth"
+    namespace = "kube-system"
+  }
+  data = {
+    mapUsers = yamlencode([
+      for user in var.cluster_admins : {
+        userarn = user.userarn
+        username = user.username
+        groups = ["system:masters"]
+      }
+    ])
+    mapRoles = yamlencode([{
+      rolearn = aws_iam_role.eks_node_role.arn
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = ["system:bootstrappers", "system:nodes"]
+    }])
+  }
+  force = true
+}

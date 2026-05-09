@@ -38,6 +38,13 @@ variable "cluster_name"{
 	type = string
 	default = "qwen-cluster"
 }
+variable "cluster_admins" {
+  type = list(object({
+    userarn = string
+    username = string
+  }))
+  default = []
+}
 variable "tags" {
   type = map(string)
   default = {
