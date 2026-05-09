@@ -55,3 +55,9 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        env:
+          cluster_admin_Danil: ${{secrets.cluster_admin_Danil}}
+          cluster_admin_Cejay: ${{secrets.cluster_admin_Cejay}}
+          cluster_admin_Nigel: ${{secrets.cluster_admin_Nigel}}
+          cluster_admin_Rik: ${{secrets.cluster_admin_Rik}}
+          cluster_admin_Andonis: ${{secrets.cluster_admin_Andonis}}
