@@ -31,8 +31,8 @@ jobs:
         #just a check to see if the admin secrets for the github repo are actually being used
       - name: Verify cluster admins secret
         run: |
-          if [ -z "$TF_VAR_cluster_admins" ]; then
-          echo "ERROR: TF_VAR_cluster_admins secret is not set"
+          if [ -z "$cluster_admin_Danil" ]; then
+          echo "ERROR: cluster_admin_Danil secret is not set"
           exit 1
           fi
           echo "cluster_admins is set, proceeding..."
