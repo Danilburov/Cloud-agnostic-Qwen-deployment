@@ -31,17 +31,14 @@ jobs:
           #A check to see if the pipeline read the secrets
       - name: Verify cluster admins secret
         run: |
-          echo "CLUSTER_ADMIN_DANIL length: ${#CLUSTER_ADMIN_DANIL}"
-          echo "CLUSTER_ADMIN_CEJAY length: ${#CLUSTER_ADMIN_CEJAY}"
-          echo "CLUSTER_ADMIN_NIGEL length: ${#CLUSTER_ADMIN_NIGEL}"
-          echo "CLUSTER_ADMIN_RIK length: ${#CLUSTER_ADMIN_RIK}"
-          echo "CLUSTER_ADMIN_ANDONIS length: ${#CLUSTER_ADMIN_ANDONIS}"
+          echo "TF_VAR_cluster_admins length: ${#TF_VAR_cluster_admins}"
+          if [ -z "$TF_VAR_cluster_admins" ]; then
+          echo "ERROR: TF_VAR_cluster_admins is empty or not set"
+            exit 1
+          fi
+          echo "Secret is set, proceeding..."
         env:
-          CLUSTER_ADMIN_DANIL: ${{ secrets.CLUSTER_ADMIN_DANIL }}
-          CLUSTER_ADMIN_CEJAY: ${{ secrets.CLUSTER_ADMIN_CEJAY }}
-          CLUSTER_ADMIN_NIGEL: ${{ secrets.CLUSTER_ADMIN_NIGEL }}
-          CLUSTER_ADMIN_RIK: ${{ secrets.CLUSTER_ADMIN_RIK }}
-          CLUSTER_ADMIN_ANDONIS: ${{ secrets.CLUSTER_ADMIN_ANDONIS }}
+          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
   
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
