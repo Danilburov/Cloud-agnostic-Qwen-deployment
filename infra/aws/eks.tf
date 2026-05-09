@@ -6,7 +6,8 @@ resource "aws_eks_cluster" "sue_eks" {
 
   //making sure that the cluster has api and configmap as auth methods
   access_config {
-    authentication_mode = "API_AND_CONFIG_MAP"
+    authentication_mode = "API"
+    bootstrap_cluster_creator_admin_permissions = true //here i decided to assign manually the github-actions role to be the admin of the cluster
   }
   vpc_config {
     subnet_ids = [
@@ -121,30 +122,54 @@ output "cluster_name" {
 //this part is necessary because it creates a connection between the AWS IAM and the Kubernetes
 //Since by default EKS creats a cluster from the IAM entity that creates it, that being the GitHub role I created
 //So I had to manually attach our roles to the cluster so we could connect to it
-resource "kubernetes_config_map_v1_data" "aws_auth" {
-  metadata {
-    name = "aws-auth"
-    namespace = "kube-system"
+# resource "kubernetes_config_map_v1_data" "aws_auth" {
+#   metadata {
+#     name = "aws-auth"
+#     namespace = "kube-system"
+#   }
+#   data = {
+#     mapUsers = yamlencode([
+#       for user in var.cluster_admins : {
+#         userarn = user.userarn
+#         username = user.username
+#         groups = ["system:masters"]
+#       }
+#     ])
+#     mapRoles = yamlencode([{
+#       rolearn = aws_iam_role.eks_node_role.arn
+#       username = "system:node:{{EC2PrivateDNSName}}"
+#       groups = ["system:bootstrappers", "system:nodes"]
+#     },
+#     {
+#       rolearn  = "arn:aws:iam::442908905354:role/github-actions-role"  # ← add this
+#       username = "github-actions"
+#       groups   = ["system:masters"]
+#     }
+#     ])
+#   }
+#   force = true
+# }
+
+//new approach since the pipeline is failing since I changed the code
+//with this code I am trying to ensure that all the team members can access the cluster
+
+resource "aws_eks_access_entry" "admin_users" {
+  for_each = { for user in var.cluster_admins : user.username => user }
+
+  cluster_name = aws_eks_cluster.sue_eks.name
+  principal_arn = each.value.userarn
+  type = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "admin_users" {
+  for_each = { for user in var.cluster_admins : user.username => user }
+
+  cluster_name = aws_eks_cluster.sue_eks.name
+  principal_arn = each.value.userarn
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
   }
-  data = {
-    mapUsers = yamlencode([
-      for user in var.cluster_admins : {
-        userarn = user.userarn
-        username = user.username
-        groups = ["system:masters"]
-      }
-    ])
-    mapRoles = yamlencode([{
-      rolearn = aws_iam_role.eks_node_role.arn
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = ["system:bootstrappers", "system:nodes"]
-    },
-    {
-      rolearn  = "arn:aws:iam::442908905354:role/github-actions-role"  # ← add this
-      username = "github-actions"
-      groups   = ["system:masters"]
-    }
-    ])
-  }
-  force = true
+  depends_on = [aws_eks_access_entry.admin_users]
 }
