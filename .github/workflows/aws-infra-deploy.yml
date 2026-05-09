@@ -27,21 +27,21 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION || 'eu-central-1' }}
-
-        #just a check to see if the admin secrets for the github repo are actually being used
+        
+          #A check to see if the pipeline read the secrets
       - name: Verify cluster admins secret
         run: |
-          if [ -z "$cluster_admin_Danil" ]; then
-          echo "ERROR: cluster_admin_Danil secret is not set"
-          exit 1
-          fi
-          echo "cluster_admins is set, proceeding..."
+          echo "CLUSTER_ADMIN_DANIL length: ${#CLUSTER_ADMIN_DANIL}"
+          echo "CLUSTER_ADMIN_CEJAY length: ${#CLUSTER_ADMIN_CEJAY}"
+          echo "CLUSTER_ADMIN_NIGEL length: ${#CLUSTER_ADMIN_NIGEL}"
+          echo "CLUSTER_ADMIN_RIK length: ${#CLUSTER_ADMIN_RIK}"
+          echo "CLUSTER_ADMIN_ANDONIS length: ${#CLUSTER_ADMIN_ANDONIS}"
         env:
-          cluster_admin_Danil: ${{secrets.cluster_admin_Danil}}
-          cluster_admin_Cejay: ${{secrets.cluster_admin_Cejay}}
-          cluster_admin_Nigel: ${{secrets.cluster_admin_Nigel}}
-          cluster_admin_Rik: ${{secrets.cluster_admin_Rik}}
-          cluster_admin_Andonis: ${{secrets.cluster_admin_Andonis}}
+          CLUSTER_ADMIN_DANIL: ${{ secrets.CLUSTER_ADMIN_DANIL }}
+          CLUSTER_ADMIN_CEJAY: ${{ secrets.CLUSTER_ADMIN_CEJAY }}
+          CLUSTER_ADMIN_NIGEL: ${{ secrets.CLUSTER_ADMIN_NIGEL }}
+          CLUSTER_ADMIN_RIK: ${{ secrets.CLUSTER_ADMIN_RIK }}
+          CLUSTER_ADMIN_ANDONIS: ${{ secrets.CLUSTER_ADMIN_ANDONIS }}
   
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
@@ -65,11 +65,7 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         env:
-          cluster_admin_Danil: ${{secrets.cluster_admin_Danil}}
-          cluster_admin_Cejay: ${{secrets.cluster_admin_Cejay}}
-          cluster_admin_Nigel: ${{secrets.cluster_admin_Nigel}}
-          cluster_admin_Rik: ${{secrets.cluster_admin_Rik}}
-          cluster_admin_Andonis: ${{secrets.cluster_admin_Andonis}}
+          cluster_admins: ${{secrets.cluster_admins}}
           
       - name: Configure kubectl
         run: |
