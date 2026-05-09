@@ -1,19 +1,15 @@
 name: AWS infra destroy
-
 on:
   workflow_dispatch: 
-
 permissions:
   id-token: write
   contents: read
-
 jobs:
   destroy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: infra/aws/
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,7 +19,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION || 'eu-central-1' }}
-          
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -32,8 +28,8 @@ jobs:
       - name: Configure kubectl
         run: |
           aws eks update-kubeconfig \
-          --region ${{ secrets.AWS_REGION }} \
-          --name qwen-cluster
+            --region ${{ secrets.AWS_REGION }} \
+            --name qwen-cluster
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -43,15 +39,15 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=backend.hcl
 
-      - name: Show Destroy plan
-        run: terraform plan -destroy
-        continue-on-error: true
-
-      - name: Show backend.hcl contents
-        run: cat backend.hcl
-        
-      - name: Verify state lists resources
-        run: terraform state list || echo "No state found"
+      - name: Remove ConfigMap from state
+        run: |
+          terraform state rm kubernetes_config_map_v1_data.aws_auth || echo "ConfigMap not in state"
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
+        env:
+          cluster_admin_Danil: ${{secrets.cluster_admin_Danil}}
+          cluster_admin_Cejay: ${{secrets.cluster_admin_Cejay}}
+          cluster_admin_Nigel: ${{secrets.cluster_admin_Nigel}}
+          cluster_admin_Rik: ${{secrets.cluster_admin_Rik}}
+          cluster_admin_Andonis: ${{secrets.cluster_admin_Andonis}}
