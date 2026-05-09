@@ -1,9 +1,13 @@
 # EKS Cluster
 resource "aws_eks_cluster" "sue_eks" {
-  name     = var.cluster_name
+  name = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
-  version  = "1.30"
+  version = "1.30"
 
+  //making sure that the cluster has api and configmap as auth methods
+  access_config {
+    authentication_mode = "API_AND_CONFIG_MAP"
+  }
   vpc_config {
     subnet_ids = [
       aws_subnet.sue-subnet-private-1.id,
