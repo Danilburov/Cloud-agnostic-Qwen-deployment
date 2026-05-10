@@ -46,4 +46,4 @@ jobs:
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
         env:
-          TF_VARS_cluster_admins: ${{secrets.TF_VARS_cluster_admins}}
+          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}

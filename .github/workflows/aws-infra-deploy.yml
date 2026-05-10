@@ -31,14 +31,14 @@ jobs:
           #A check to see if the pipeline read the secrets
       - name: Verify cluster admins secret
         run: |
-          echo "TF_VARS_cluster_admins length: ${#TF_VARS_cluster_admins}"
-          if [ -z "$TF_VARS_cluster_admins" ]; then
-          echo "ERROR: TF_VARS_cluster_admins is empty or not set"
+          echo "TF_VAR_cluster_admins length: ${#TF_VAR_cluster_admins}"
+          if [ -z "$TF_VAR_cluster_admins" ]; then
+          echo "ERROR: TF_VAR_cluster_admins is empty or not set"
             exit 1
           fi
           echo "Secret is set, proceeding..."
         env:
-          TF_VARS_cluster_admins: ${{secrets.TF_VARS_cluster_admins}}
+          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
   
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
@@ -62,7 +62,7 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         env:
-          TF_VARS_cluster_admins: ${{secrets.TF_VARS_cluster_admins}}
+          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
           
       - name: Configure kubectl
         run: |
