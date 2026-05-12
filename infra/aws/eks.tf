@@ -84,11 +84,11 @@ resource "aws_eks_node_group" "sue_eks_nodes" {
     aws_subnet.sue-subnet-private-1.id,
     aws_subnet.sue-subnet-private-2.id
   ]
-  instance_types = ["t3.medium"]
+  instance_types = ["t3.2xlarge"] //CPU based instance type, would be great to test it with GPU
   ami_type       = "AL2_x86_64"
-  disk_size      = 20
+  disk_size      = 50
   scaling_config {
-    desired_size = 2
+    desired_size = 1
     min_size     = 1
     max_size     = 4
   }
