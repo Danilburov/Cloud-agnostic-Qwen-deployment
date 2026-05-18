@@ -75,7 +75,7 @@ jobs:
 
       - name: Install KServe
         run: |
-          kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.14.0/kserve.yaml
+          kubectl apply --server-side -f https://github.com/kserve/kserve/releases/download/v0.14.0/kserve.yaml
 
       - name: Wait for KServe
         run: |
