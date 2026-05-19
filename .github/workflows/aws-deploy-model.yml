@@ -1,109 +1,16 @@
-name: Deploy model in AWS EKS
-on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["AWS deploy infra"]
-    types:
-      - completed
-    branches:
-      - main
+# name: Deploy model in AWS EKS
+# on:
+#   workflow_dispatch:
+#   workflow_run:
+#     workflows: ["AWS deploy infra"]
+#     types:
+#       - completed
+#     branches:
+#       - main
 
-permissions:
-  id-token: write
-  contents: read
+# permissions:
+#   id-token: write
+#   contents: read
 
-jobs:
-  deploy-model:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{secrets.AWS_ROLE_ARN}}
-          aws-region: ${{secrets.AWS_REGION}}
-
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.30.0'
-
-      - name: Configure kubectl
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{secrets.AWS_REGION}} \
-            --name qwen-cluster
-
-      - name: Install cert-manager
-        run: |
-          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
-
-      - name: Wait for cert-manager
-        run: |
-          kubectl wait --for=condition=ready pod \
-            -l app=cert-manager \
-            -n cert-manager \
-            --timeout=120s
-          kubectl wait --for=condition=ready pod \
-            -l app=cainjector \
-            -n cert-manager \
-            --timeout=120s
-          kubectl wait --for=condition=ready pod \
-            -l app=webhook \
-            -n cert-manager \
-            --timeout=120s
-
-      - name: Install Istio
-        run: |
-          curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.20.0 sh -
-          export PATH=$PWD/istio-1.20.0/bin:$PATH
-          istioctl install --set profile=default -y
-
-      - name: Wait for Istio
-        run: |
-          kubectl wait --for=condition=ready pod \
-            -l app=istiod \
-            -n istio-system \
-            --timeout=180s
-          kubectl wait --for=condition=ready pod \
-            -l app=istio-ingressgateway \
-            -n istio-system \
-            --timeout=180s
-
-      - name: Install KServe
-        run: |
-          kubectl apply --server-side --force-conflicts -f https://github.com/kserve/kserve/releases/download/v0.14.0/kserve.yaml
-
-      - name: Wait for KServe
-        run: |
-          kubectl wait --for=condition=ready pod \
-            -l control-plane=kserve-controller-manager \
-            -n kserve \
-            --timeout=300s
-
-      - name: Install KServe cluster resources
-        run: |
-          kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.14.0/kserve-cluster-resources.yaml
-
-      - name: Wait for KServe CRDs
-        run: |
-          kubectl wait --for=condition=established crd \
-            inferenceservices.serving.kserve.io \
-            --timeout=60s
-          kubectl wait --for=condition=established crd \
-            clusterservingruntimes.serving.kserve.io \
-            --timeout=60s
-
-      - name: Deploy Qwen model
-        run: |
-          kubectl apply -f apps/kserve/qwen.yaml
-
-      - name: Wait for Qwen pod to start
-        run: |
-          kubectl wait --for=condition=ready pod \
-            -l serving.kserve.io/inferenceservice=qwen \
-            -n default \
-            --timeout=600s
+# jobs:
+  

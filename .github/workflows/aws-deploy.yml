@@ -1,0 +1,165 @@
+name: AWS deploy infra and Qwen model inside EKS cluster
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: infra/aws/
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'eu-central-1' }}
+        
+          #A check to see if the pipeline read the secrets
+      - name: Verify cluster admins secret
+        run: |
+          echo "TF_VAR_cluster_admins length: ${#TF_VAR_cluster_admins}"
+          if [ -z "$TF_VAR_cluster_admins" ]; then
+          echo "ERROR: TF_VAR_cluster_admins is empty or not set"
+            exit 1
+          fi
+          echo "Secret is set, proceeding..."
+        env:
+          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
+  
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.30.0'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.hcl
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        env:
+          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
+          
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+          --region ${{secrets.AWS_REGION}} \
+          --name qwen-cluster
+  deploy-model:
+    runs-on: ubuntu-latest
+    needs: terraform-deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+          aws-region: ${{secrets.AWS_REGION}}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.30.0'
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{secrets.AWS_REGION}} \
+            --name qwen-cluster
+
+      - name: Install cert-manager
+        run: |
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+
+      - name: Wait for cert-manager
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l app=cert-manager \
+            -n cert-manager \
+            --timeout=120s
+          kubectl wait --for=condition=ready pod \
+            -l app=cainjector \
+            -n cert-manager \
+            --timeout=120s
+          kubectl wait --for=condition=ready pod \
+            -l app=webhook \
+            -n cert-manager \
+            --timeout=120s
+
+      - name: Install Istio
+        run: |
+          curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.20.0 sh -
+          export PATH=$PWD/istio-1.20.0/bin:$PATH
+          istioctl install --set profile=default -y
+
+      - name: Wait for Istio
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l app=istiod \
+            -n istio-system \
+            --timeout=180s
+          kubectl wait --for=condition=ready pod \
+            -l app=istio-ingressgateway \
+            -n istio-system \
+            --timeout=180s
+
+      - name: Install KServe
+        run: |
+          kubectl apply --server-side --force-conflicts -f https://github.com/kserve/kserve/releases/download/v0.14.0/kserve.yaml
+
+      - name: Wait for KServe
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l control-plane=kserve-controller-manager \
+            -n kserve \
+            --timeout=300s
+
+      - name: Install KServe cluster resources
+        run: |
+          kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.14.0/kserve-cluster-resources.yaml
+
+      - name: Wait for KServe CRDs
+        run: |
+          kubectl wait --for=condition=established crd \
+            inferenceservices.serving.kserve.io \
+            --timeout=60s
+          kubectl wait --for=condition=established crd \
+            clusterservingruntimes.serving.kserve.io \
+            --timeout=60s
+
+      - name: Deploy Qwen model
+        run: |
+          kubectl apply -f apps/kserve/qwen.yaml
+
+      - name: Wait for Qwen pod to start
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l serving.kserve.io/inferenceservice=qwen \
+            -n default \
+            --timeout=600s
