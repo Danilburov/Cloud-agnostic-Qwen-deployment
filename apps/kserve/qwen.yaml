@@ -12,7 +12,7 @@ spec:
         name: huggingface
       args:
         - --model_name=qwen
-        - --model_id=Qwen/Qwen2.5-1.5B-Instruct
+        - --model_id=Qwen/Qwen2.5-7B-Instruct
         - --backend=huggingface 
       env:
         - name: CUDA_VISIBLE_DEVICES
@@ -20,7 +20,7 @@ spec:
       resources:
         requests:
           cpu: "4"
-          memory: "8Gi"
+          memory: "20Gi"
         limits:
           cpu: "8"
-          memory: "56Gi"
+          memory: "110Gi"
