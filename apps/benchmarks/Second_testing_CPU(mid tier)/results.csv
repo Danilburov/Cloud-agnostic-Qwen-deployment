@@ -1,0 +1,330 @@
+"Label","Prompt","EKS_Model","EKS_Instance","EKS_Answer","EKS_Latency_ms","EKS_InputTokens","EKS_OutputTokens","EKS_TotalTokens","EKS_CostPerRequest","Bedrock_Model","Bedrock_Answer","Bedrock_Latency_ms","Bedrock_ApiLatency_ms","Bedrock_InputTokens","Bedrock_OutputTokens","Bedrock_TotalTokens","Bedrock_CostPerRequest"
+"Simple COBOL to Python","Convert this COBOL code to Python: IDENTIFICATION DIVISION. PROGRAM-ID. HELLO. PROCEDURE DIVISION. DISPLAY 'Hello World'. STOP RUN.","Qwen2.5-0.5B","t3.2xlarge","Certainly! Below is the equivalent Python code for the given COBOL program:
+
+```python
+import sys
+
+def main():
+    print(""Hello World"")
+
+if __name__ == ""__main__"":
+    main()
+```
+
+### Explanation:
+- **IDENTIFICATION DIVISION**: This part of the COBOL program is not directly translatable to Python. Python does not have a `IDENTIFICATION DIVISION` in the same way COBOL does.
+- **PROGRAM-ID**: This is the name of the program, which is `HELLO` in this case.
+- **PROCEDURE DIVISION**: This is where the program logic resides. In Python, we use a `def` function to define a procedure.
+- **DISPLAY 'Hello World'**: This is a `WRITE` statement in COBOL, which in Python is used to print a message to the console.
+- **STOP RUN**: This is a `STOP RUN` statement in COBOL, which in Python is not necessary as the program will stop running when the `main()` function is called.
+
+This Python code will output ""Hello World"" when executed.","30811","62","228","290","0.006573","Qwen3-32B","Here's the equivalent Python code for the provided COBOL program:
+
+### COBOL Code:
+```cobol
+IDENTIFICATION DIVISION.
+PROGRAM-ID. HELLO.
+PROCEDURE DIVISION.
+    DISPLAY 'Hello World'.
+    STOP RUN.
+```
+
+### Python Equivalent:
+```python
+print(""Hello World"")
+```
+
+### Explanation:
+- The line `DISPLAY 'Hello World'` in COBOL is equivalent to `print(""Hello World"")` in Python.
+- The `STOP RUN` statement ends the program, which in Python is implied at the end of the script. So, it’s not necessary to explicitly ""stop"" in Python.
+
+Let me know if you need help converting more complex COBOL programs!","1122","583","45","149","194","0.000198"
+"Refactor unreadable Java","Refactor this Java code to be more readable, add proper variable names and comments: for(int i=0;i<arr.length;i++){if(arr[i]%2==0){sum+=arr[i];}}","Qwen2.5-0.5B","t3.2xlarge","Certainly! Here's a refactored version of the Java code with improved readability, variable names, and comments:
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5, 6}; // Example array
+        int sum = 0; // Initialize sum to 0
+
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] % 2 == 0) { // Check if the element is even
+                sum += arr[i]; // Add the even element to the sum
+            }
+        }
+
+        System.out.println(""Sum of even numbers: "" + sum); // Print the result
+    }
+}
+```
+
+### Explanation of Changes:
+1. **Variable Names**: 
+   - `arr` is renamed to `arr` (no change).
+   - `sum` is renamed to `sum` (no change).
+   - `i` is renamed to `i` (no change).
+   - `arr[i]` is renamed to `arrElement` for better readability.
+
+2. **Comments**: 
+   - Added comments to explain the purpose of each part of the code.
+
+3. **Code Structure**: 
+   - The code is structured to be more readable and maintainable.
+
+4. **Example Array**: 
+   - An example array is provided to demonstrate the usage of the code.
+
+This refactored code is easier to understand and maintain, and it clearly shows the purpose of each part of the code.","44192","71","328","399","0.009428","Qwen3-32B","Here's a **refactored and more readable** version of your Java code with **meaningful variable names**, **added comments**, and **improved formatting**:
+
+```java
+// Initialize a variable to hold the sum of even numbers
+int sumOfEvens = 0;
+
+// Loop through each element in the array
+for (int i = 0; i < arr.length; i++) {
+    // Check if the current element is even
+    if (arr[i] % 2 == 0) {
+        // Add the even number to the running total
+        sumOfEvens += arr[i];
+    }
+}
+```
+
+### Explanation of the Refactor:
+- **Original line**: Compacted and less readable.
+- **Refactored**:
+  - Used a more descriptive variable name: `sumOfEvens`.
+  - Added comments to explain each logical step.
+  - Used spacing for better readability of the loop and condition.
+
+This refactored version still performs the same task but is now easier to understand and maintain.","1281","769","54","215","269","0.000282"
+"BASIC to Python","Convert this BASIC code to clean Python with proper variable names and comments: 010 LET X=0\n020 FOR I=1 TO 10\n030 LET X=X+I\n040 NEXT I\n050 PRINT X\n060 END","Qwen2.5-0.5B","t3.2xlarge","Here's the Python code with proper variable names and comments:
+
+```python
+# Initialize the variable X to 0
+X = 0
+
+# Loop from 1 to 10
+for I in range(1, 11):
+    # Add the current value of I to X
+    X += I
+
+# Print the final value of X
+print(X)
+```
+
+This Python code achieves the same functionality as the original BASIC code. It initializes `X` to 0, then iterates from 1 to 10, adding each number to `X`, and finally prints the final value of `X`.","17773","89","130","219","0.003792","Qwen3-32B","Sure! Here's a clean Python version of the provided BASIC code with proper variable names and comments for clarity:
+
+```python
+# Initialize the accumulator to 0
+total = 0
+
+# Loop from 1 to 10 (inclusive)
+for number in range(1, 11):
+    # Add the current number to the total
+    total += number
+
+# Print the final sum
+print(total)
+```
+
+### Explanation:
+- **Line 010** → `total = 0`: Initializes the total sum to 0.
+- **Line 020** → `for number in range(1, 11):`: Loops from 1 to 10.
+- **Line 030** → `total += number`: Adds the current number to the total.
+- **Line 040** → `NEXT I`: Automatically handled by the `for` loop closing.
+- **Line 050** → `print(total)`: Prints the result.
+- **Line 060** → `END`: Not needed in Python; execution ends at the end of the script.
+
+Let me know if you'd like a version that's function-based or includes input/output!","1318","802","72","253","325","0.000334"
+"Complex COBOL to Python","Convert this COBOL code to clean Python with proper variable names, functions and comments: IDENTIFICATION DIVISION. PROGRAM-ID. CALCULATE-TAX. DATA DIVISION. WORKING-STORAGE SECTION. 01 SALARY PIC 9(7)V99. 01 TAX-RATE PIC 9V99. 01 TAX-AMOUNT PIC 9(7)V99. PROCEDURE DIVISION. COMPUTE TAX-AMOUNT = SALARY * TAX-RATE. DISPLAY TAX-AMOUNT. STOP RUN.","Qwen2.5-0.5B","t3.2xlarge","ERROR","-1","0","0","0","0","Qwen3-32B","Here's the COBOL code you provided, translated into clean and well-structured Python. The Python version includes proper variable names, functions, comments, and uses Pythonic syntax and conventions.
+
+---
+
+### ✅ Original COBOL Code Summary
+The COBOL program:
+- Reads a **salary** value (fixed decimal format).
+- Applies a **tax rate** (fixed decimal percentage).
+- Computes **tax amount** as salary × tax rate.
+- Displays the **tax amount**.
+- Ends the program.
+
+---
+
+### 🐍 Clean Python Equivalent
+
+```python
+def calculate_tax(salary: float, tax_rate: float) -> float:
+    """"""
+    Calculate the tax amount based on the provided salary and tax rate.
+
+    Args:
+        salary (float): The gross salary amount.
+        tax_rate (float): The tax rate as a percentage (e.g., 15 for 15%).
+
+    Returns:
+        float: The computed tax amount.
+    """"""
+    # Convert percentage rate to a decimal for calculation
+    tax_rate_decimal = tax_rate / 100.0
+    return salary * tax_rate_decimal
+
+
+def main():
+    """"""
+    Main function to execute tax calculation.
+    """"""
+    # Example salary and tax rate (can be replaced with input logic)
+    salary = 50000.00       # Example salary
+    tax_rate = 15.0         # Example tax rate (15%)
+
+    # Calculate the tax amount
+    tax_amount = calculate_tax(salary, tax_rate)
+
+    # Display the result
+    print(f""Tax Amount: {tax_amount:.2f}"")
+
+
+if __name__ == ""__main__"":
+    main()
+```
+
+---
+
+### 🧪 Input & Output Example
+
+```text
+Tax Amount: 7500.00
+```
+
+In the example above:
+- Salary = $50,000
+- Tax Rate = 15%
+- Tax Amount = 50000 × 0.15 = 7500.00
+
+---
+
+### 📌 Notes:
+- You can modify the `salary` and `tax_rate` variables to test other values.
+- If you want to make the program interactive, you can replace the hardcoded values with `input()` statements.
+- Python handles decimals with `float`, so this matches COBOL's `PIC 9(7)V99` format for fixed decimal numbers reasonably.
+
+Would you like an interactive version where the user inputs the salary and tax rate?","4177","3658","124","525","649","0.000687"
+"Legacy C to Python","Convert this legacy C code to modern Python with proper error handling and comments: #include<stdio.h> int main(){int a[5]={1,2,3,4,5};int sum=0;int i;for(i=0;i<5;i++){sum=sum+a[i];}printf('%d',sum);return 0;}","Qwen2.5-0.5B","t3.2xlarge","Certainly! Below is the equivalent Python code with proper error handling and comments:
+
+```python
+# Import the necessary module for handling exceptions
+import sys
+
+def main():
+    try:
+        # Define an array with 5 elements initialized to 1, 2, 3, 4, and 5
+        a = [1, 2, 3, 4, 5]
+        
+        # Initialize a variable to store the sum
+        sum = 0
+        
+        # Loop through the array and add each element to the sum
+        for i in range(len(a)):
+            sum += a[i]
+        
+        # Print the sum
+        print(sum)
+        
+    except Exception as e:
+        # Print an error message if an exception occurs
+        print(f""An error occurred: {e}"", file=sys.stderr)
+    finally:
+        # This block will execute regardless of whether an exception was raised or not
+        print(""Program execution completed."")
+
+if __name__ == ""__main__"":
+    main()
+```
+
+### Explanation:
+1. **Importing `sys` module**: This is used to handle exceptions.
+2. **Defining the `main` function**: This is the entry point of the program.
+3. **Using a `try-except` block**: This block is used to catch and handle exceptions that might occur during the execution of the program.
+4. **Using `range(len(a))`**: This is used to iterate over the array elements.
+5. **Using `print` with `file=sys.stderr`**: This is used to print error messages to the standard error stream.
+6. **Using `finally` block**: This block is used to execute code that must run regardless of whether an exception was raised or not.
+
+This Python code is equivalent to the given C code and includes proper error handling and comments.","51274","100","376","476","0.010938","Qwen3-32B","Sure! Here's a modern, PEP8-compliant Python version of your legacy C code, with proper error handling and comments for clarity.
+
+---
+
+### ✅ **C Code (Original)**
+
+```c
+#include<stdio.h>
+
+int main() {
+    int a[5] = {1, 2, 3, 4, 5};
+    int sum = 0;
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        sum = sum + a[i];
+    }
+
+    printf('%d', sum);
+    return 0;
+}
+```
+
+---
+
+### ✅ **Python Version with Error Handling and Comments**
+
+```python
+# Python version of the legacy C code that calculates the sum of an array.
+
+def main():
+    """"""
+    This function performs the equivalent of the C code:
+        - Defines an integer list (array) of 5 elements.
+        - Calculates the sum of its elements.
+        - Prints the result.
+    """"""
+    try:
+        # Define the list of integers analogous to the C array.
+        numbers = [1, 2, 3, 4, 5]
+
+        # Initialize sum to 0
+        total_sum = 0
+
+        # Loop through each number in the list and sum them
+        for num in numbers:
+            total_sum += num
+
+        # Print the sum
+        print(total_sum)
+
+    except Exception as e:
+        # Handle any unexpected errors during the process
+        print(f""An error occurred: {e}"")
+
+# Entry point of the program
+if __name__ == ""__main__"":
+    main()
+```
+
+---
+
+### ✅ **Explanation:**
+
+- **`main()` function** replaces the C `main()` and makes the code modular.
+- **`try/except` block** adds error handling for robustness (e.g., if the data changes to include non-integer types at runtime).
+- **List** is used instead of a C-style array.
+- **For loop** is cleaner and more Pythonic, no need to manage an index.
+- **PEP8 compliant** formatting and spacing make the code readable.
+
+---
+
+### ✅ **Sample Output**
+```
+15
+```
+
+Let me know if you'd like to extend this with input from the user or additional error checks!","2354","1856","83","478","561","0.000618"
