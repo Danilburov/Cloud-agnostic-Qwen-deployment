@@ -1,11 +1,21 @@
 terraform {
+  required_version = ">= 1.5.0"
+
+  backend "azurerm" {
+    resource_group_name  = "sue-tf-state-rg"
+    storage_account_name = "suetfstate"
+    container_name       = "tfstate"
+    key                  = "aks/terraform.tfstate"
+  }
+
   required_providers {
     azurerm = {
-        source = "hashicorp/azurerm"
-        version = "~>3.0"
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
     }
   }
 }
+
 provider "azurerm" {
 //Here we can add the region if neccesseray, as it was done for AWS version.tf file
 //However, unsure what we need here still
