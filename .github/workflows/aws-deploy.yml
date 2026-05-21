@@ -163,3 +163,14 @@ jobs:
             -l serving.kserve.io/inferenceservice=qwen \
             -n default \
             --timeout=600s
+      - name: Expose Qwen via LoadBalancer
+        run: |
+          kubectl patch service qwen-predictor -n default \
+            -p '{"spec": {"type": "LoadBalancer"}}'
+
+      - name: Print Qwen endpoint
+        run: |
+          sleep 30
+          HOSTNAME=$(kubectl get service qwen-predictor -n default \
+          -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "http://$HOSTNAME/openai/v1/chat/completions"
