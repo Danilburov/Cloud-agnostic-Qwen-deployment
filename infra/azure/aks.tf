@@ -7,17 +7,17 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
   kubernetes_version  = "1.35"
 
   # System node pool placed in private subnets
-  # VM size: Standard_D16s_v3 (16 vCPU, 64 GB) — CPU only, same as r5.4xlarge in AWS.
   default_node_pool {
     name                 = "system"
     node_count           = 1
     min_count            = 1
     max_count            = 4
     auto_scaling_enabled = true
-    vm_size              = "Standard_D16s_v3"
+    vm_size              = "Standard_B2s_v2"
     os_disk_size_gb      = 50
     vnet_subnet_id       = azurerm_subnet.sue_subnet_private_1.id
     tags                 = var.tags
+
   }
 
   # SystemAssigned identity — works without IAM/Service Principal permissions.
@@ -32,16 +32,14 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
   }
 
   # Azure CNI so pods get VNet-native IPs — required for KServe/Istio
-  network_profile {
-    network_plugin    = "azure"
-    load_balancer_sku = "standard"
-    outbound_type     = "loadBalancer"
-  }
+network_profile {
+  network_plugin     = "azure"
+  load_balancer_sku  = "standard"
+  outbound_type      = "loadBalancer"
+  service_cidr       = "10.1.0.0/16"
+  dns_service_ip     = "10.1.0.10"
+}
 
-  # Azure AD RBAC
-  azure_active_directory_role_based_access_control {
-    azure_rbac_enabled = true
-  }
 
   tags = var.tags
 }
@@ -104,6 +102,7 @@ resource "azurerm_role_assignment" "cluster_admins" {
 output "cluster_endpoint" {
   description = "AKS cluster API server endpoint"
   value       = azurerm_kubernetes_cluster.sue_aks.kube_config[0].host
+  sensitive   = true
 }
 
 output "cluster_certificate_authority" {

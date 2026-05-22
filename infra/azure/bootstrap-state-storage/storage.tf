@@ -9,14 +9,14 @@ resource "azurerm_resource_group" "tf_state_rg" {
 
 // Storage account
 resource "azurerm_storage_account" "tf_state" {
-  name                     = "${local.name}tfstate" // globally unique, lowercase, max 24 chars
+  name                     = "${local.name}tfstate"
   resource_group_name      = azurerm_resource_group.tf_state_rg.name
   location                 = azurerm_resource_group.tf_state_rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
   blob_properties {
-    versioning_enabled = true // mirrors aws_s3_bucket_versioning
+    versioning_enabled = true
   }
 
   tags = {
