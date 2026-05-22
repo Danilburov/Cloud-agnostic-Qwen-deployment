@@ -4,7 +4,7 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
   location            = azurerm_resource_group.sue_rg.location
   resource_group_name = azurerm_resource_group.sue_rg.name
   dns_prefix          = var.cluster_name
-  kubernetes_version  = "1.30"
+  kubernetes_version  = "1.35"
 
   # System node pool placed in private subnets
   # VM size: Standard_D16s_v3 (16 vCPU, 64 GB) — CPU only, same as r5.4xlarge in AWS.
@@ -35,7 +35,7 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
-    outbound_type     = "userAssignedNATGateway" # routes egress through our NAT gateway
+    outbound_type     = "loadBalancer"
   }
 
   # Azure AD RBAC
