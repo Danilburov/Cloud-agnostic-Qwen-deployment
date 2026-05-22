@@ -1,4 +1,4 @@
-# AKS Cluster — mirrors aws_eks_cluster.sue_eks
+# AKS Cluster
 resource "azurerm_kubernetes_cluster" "sue_aks" {
   name                = var.cluster_name
   location            = azurerm_resource_group.sue_rg.location
@@ -6,17 +6,14 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
   dns_prefix          = var.cluster_name
   kubernetes_version  = "1.30"
 
-  # System node pool placed in private subnets — mirrors aws_eks_node_group.sue_eks_nodes
+  # System node pool placed in private subnets
   # VM size: Standard_D16s_v3 (16 vCPU, 64 GB) — CPU only, same as r5.4xlarge in AWS.
-  # TODO: swap to a GPU SKU once region + quota are confirmed, e.g.:
-  #   Standard_NV36ads_A10_v5  — 1x A10 24GB  (best fit for vLLM inference)
-  #   Standard_NC24ads_A100_v4 — 1x A100 80GB (more headroom)
   default_node_pool {
     name                 = "system"
     node_count           = 1
     min_count            = 1
     max_count            = 4
-    auto_scaling_enabled = true        # azurerm 4.x syntax (was enable_auto_scaling in 3.x)
+    auto_scaling_enabled = true
     vm_size              = "Standard_D16s_v3"
     os_disk_size_gb      = 50
     vnet_subnet_id       = azurerm_subnet.sue_subnet_private_1.id
@@ -41,7 +38,7 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
     outbound_type     = "userAssignedNATGateway" # routes egress through our NAT gateway
   }
 
-  # Azure AD RBAC — mirrors EKS API auth mode
+  # Azure AD RBAC
   azure_active_directory_role_based_access_control {
     azure_rbac_enabled = true
   }
@@ -49,7 +46,7 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
   tags = var.tags
 }
 
-# NSG for AKS nodes — mirrors aws_security_group.eks_nodes_sg
+# NSG for AKS nodes
 resource "azurerm_network_security_group" "sue_aks_nodes_nsg" {
   name                = "${var.cluster_name}-nodes-nsg"
   location            = azurerm_resource_group.sue_rg.location
@@ -68,7 +65,7 @@ resource "azurerm_network_security_group" "sue_aks_nodes_nsg" {
     destination_address_prefix = "VirtualNetwork"
   }
 
-  # Allow control plane → nodes on high ports — mirrors from_port 1025 to 65535
+  # Allow control plane → nodes on high ports
   security_rule {
     name                       = "allow-control-plane-to-nodes"
     priority                   = 110
@@ -95,8 +92,6 @@ resource "azurerm_subnet_network_security_group_association" "private_2" {
 }
 
 # Grant cluster-admin to each member in cluster_admins
-# Mirrors aws_eks_access_entry + aws_eks_access_policy_association
-# TODO: populate var.cluster_admins once AAD object IDs are known
 resource "azurerm_role_assignment" "cluster_admins" {
   for_each = { for user in var.cluster_admins : user.username => user }
 
@@ -105,7 +100,7 @@ resource "azurerm_role_assignment" "cluster_admins" {
   principal_id         = each.value.object_id
 }
 
-# Outputs — mirrors eks.tf outputs
+# Outputs
 output "cluster_endpoint" {
   description = "AKS cluster API server endpoint"
   value       = azurerm_kubernetes_cluster.sue_aks.kube_config[0].host
