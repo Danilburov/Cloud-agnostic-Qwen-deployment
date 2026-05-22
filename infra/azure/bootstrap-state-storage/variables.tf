@@ -1,7 +1,7 @@
 variable "location" {
   type        = string
   description = "Azure region for state storage resources"
-  default     = "germanywestcentral"
+  default     = "westeurope"
 }
 
 variable "project" {

@@ -1,6 +1,6 @@
 variable "azure_location" {
   type    = string
-  default = "germanywestcentral" # TBD — confirm region has required GPU SKU quota - still in process of confirmation
+  default = "westeurope"
 }
 
 variable "resource_group_name" {
