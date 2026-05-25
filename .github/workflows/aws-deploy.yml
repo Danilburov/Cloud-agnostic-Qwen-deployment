@@ -27,18 +27,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION || 'eu-central-1' }}
-        
-          #A check to see if the pipeline read the secrets
-      - name: Verify cluster admins secret
-        run: |
-          echo "TF_VAR_cluster_admins length: ${#TF_VAR_cluster_admins}"
-          if [ -z "$TF_VAR_cluster_admins" ]; then
-          echo "ERROR: TF_VAR_cluster_admins is empty or not set"
-            exit 1
-          fi
-          echo "Secret is set, proceeding..."
-        env:
-          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
   
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
