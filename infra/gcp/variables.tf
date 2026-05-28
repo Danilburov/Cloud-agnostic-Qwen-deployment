@@ -31,9 +31,15 @@ variable "project_name" {
 }
 
 variable "region" {
-  type = string
+  default = "europe-west4"
 }
 
 variable "bootstrap_project" {
   type = string
+}
+
+variable "machine_type" {
+  type        = string
+  default     = "ec2-standard-4"
+  description = "machine type for the GKE nodes"
 }
