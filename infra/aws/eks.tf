@@ -151,8 +151,8 @@ output "cluster_name" {
 # }
 
 //new approach since the pipeline is failing since I changed the code
-//with this code I am trying to ensure that all the team members can access the cluster
-
+//with this code I am trying to ensure that all the team members can 
+//access the cluster
 resource "aws_eks_access_entry" "admin_users" {
   for_each = { for user in var.cluster_admins : user.username => user }
 

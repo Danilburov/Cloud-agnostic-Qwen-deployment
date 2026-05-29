@@ -151,6 +151,12 @@ jobs:
             -l serving.kserve.io/inferenceservice=qwen \
             -n default \
             --timeout=600s
+
+    #eks creates its own load balancer on provisioning,
+    #but KServe creates a NodePort service by default. 
+    #To expose the Qwen predictor externally, 
+    #we need to patch the service to change its type to LoadBalancer. 
+    #This will allow us to access the model from outside the cluster.
       - name: Expose Qwen via LoadBalancer
         run: |
           kubectl patch service qwen-predictor -n default \
