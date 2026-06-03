@@ -1,13 +1,25 @@
 terraform {
+  backend "azurerm" {}
+
+  required_version = ">= 1.5.0"
+
   required_providers {
     azurerm = {
-        source = "hashicorp/azurerm"
-        version = "~>3.0"
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
     }
   }
 }
+
 provider "azurerm" {
-//Here we can add the region if neccesseray, as it was done for AWS version.tf file
-//However, unsure what we need here still
-  features {}
+  features {
+    resource_group {
+      # Allows Terraform to destroy the RG even when it still contains resources
+      prevent_deletion_if_contains_resources = false
+    }
+    key_vault {
+      purge_soft_delete_on_destroy    = true
+      recover_soft_deleted_key_vaults = true
+    }
+  }
 }
