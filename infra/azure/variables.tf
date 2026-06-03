@@ -1,6 +1,6 @@
 variable "azure_location" {
   type    = string
-  default = "swedencentral"
+  default = "italynorth"
 }
 
 variable "resource_group_name" {

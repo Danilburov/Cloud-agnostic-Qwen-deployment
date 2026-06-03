@@ -13,7 +13,7 @@ resource "azurerm_kubernetes_cluster" "sue_aks" {
     min_count            = 1
     max_count            = 4
     auto_scaling_enabled = true
-    vm_size              = "Standard_B2s_v2"
+    vm_size = "Standard_DC2as_v5"
     os_disk_size_gb      = 50
     vnet_subnet_id       = azurerm_subnet.sue_subnet_private_1.id
     tags                 = var.tags
