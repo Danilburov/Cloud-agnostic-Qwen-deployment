@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "tf_state_rg" {
-  name     = "${local.name}-tf-state-rg"
+  name     = "suefontys-tf-state-rg"
   location = var.location
   tags = {
     Project = local.name
@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "tf_state_rg" {
 
 // Storage account
 resource "azurerm_storage_account" "tf_state" {
-  name                     = "${local.name}tfstate"
+  name                     = "suefontystfstate"
   resource_group_name      = azurerm_resource_group.tf_state_rg.name
   location                 = azurerm_resource_group.tf_state_rg.location
   account_tier             = "Standard"
