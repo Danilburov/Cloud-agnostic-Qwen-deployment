@@ -71,4 +71,5 @@ jobs:
           az aks get-credentials \
             --resource-group sue-resource-group \
             --name qwen-cluster \
+            --admin \
             --overwrite-existing
