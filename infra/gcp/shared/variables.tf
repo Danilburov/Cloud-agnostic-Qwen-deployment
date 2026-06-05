@@ -1,12 +1,4 @@
-variable "GCP_ACCESS_KEY"{
 
-}
-variable "GCP_SECRET_KEY"{
-
-}
-variable "GCP_REGION"{
-
-}
 # variables.tf
 
 variable "org_id" {
@@ -14,9 +6,7 @@ variable "org_id" {
   type        = string
 }
 
-variable "org_id" {
-  type = string
-}
+
 
 variable "billing_account" {
   type = string
@@ -31,7 +21,7 @@ variable "project_name" {
 }
 
 variable "region" {
-  default = "europe-west4"
+  default = "us-central1"
 }
 
 variable "bootstrap_project" {
@@ -40,6 +30,20 @@ variable "bootstrap_project" {
 
 variable "machine_type" {
   type        = string
-  default     = "ec2-standard-4"
+  default     = "ec2-small"
   description = "machine type for the GKE nodes"
+}
+
+variable "cluster_name" {
+  type    = string
+  default = "sue-cluster"
+}
+variable "kserve_gsa_email" {
+  type = string
+  default = ""
+}
+
+variable "kserve_gsa_name" {
+  type = string
+  default = ""
 }
