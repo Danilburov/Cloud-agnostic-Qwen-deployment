@@ -12,7 +12,7 @@ spec:
         name: huggingface
       args:
         - --model_name=qwen
-        - --model_id=Qwen/Qwen2.5-0.5B-Instruct
+        - --model_id=Qwen/Qwen2.5-1.5B-Instruct
         - --backend=huggingface 
       env:
         - name: CUDA_VISIBLE_DEVICES

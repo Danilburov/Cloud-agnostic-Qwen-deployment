@@ -4,7 +4,7 @@ $bedrockModel = "qwen.qwen3-32b-v1:0"
 $region = "eu-central-1"
 
 # Pricing
-$eksHourlyCost = 0.768   #t3.2xlarge costs, this should be changed if testing different instance types
+$eksHourlyCost = 0.77   #t3.2xlarge costs, this should be changed if testing different instance types
 $bedrockInputPer1k  = 0.00025  #per 1k input tokens
 $bedrockOutputPer1k = 0.00125  #per 1k output tokens
 
@@ -69,7 +69,7 @@ foreach ($item in $prompts) {
         $eksRequestsPerHour = 3600000 / $eksLatency
         $eksCostPerRequest  = $eksHourlyCost / $eksRequestsPerHour
 
-        Write-Host "`n[EKS - Qwen2.5-0.5B on t3.2xlarge]"
+        Write-Host "`n[EKS - Qwen2.5-1.5B on m5.4xlarge]"
         Write-Host "Answer: $eksAnswer"
         Write-Host "Latency: $([math]::Round($eksLatency))ms"
         Write-Host "Input tokens: $eksInputTokens"
@@ -129,8 +129,8 @@ foreach ($item in $prompts) {
     $results += [PSCustomObject]@{
         Label = $label
         Prompt = $prompt
-        EKS_Model = "Qwen2.5-0.5B"
-        EKS_Instance = "t3.2xlarge"
+        EKS_Model = "Qwen2.5-1.5B"
+        EKS_Instance = "m5.4xlarge"
         EKS_Answer = $eksAnswer
         EKS_Latency_ms = [math]::Round($eksLatency)
         EKS_InputTokens = $eksInputTokens
