@@ -1,0 +1,14 @@
+# terraform.tfvars
+# Rename this to terraform.tfvars before running the deploy.ps1 script
+
+org_id          = "GCP organisation number"
+billing_account = "GCP_billing_account"
+
+project_id   = "a_unique_project_id" #
+project_name = "name of the project"
+
+region = "preferred_region"
+
+bootstrap_project = "existing_project" # Need to be done manully
+machine_type      = "machine_type" #Change to machine type that should be use for the nodes
+cluster_name = "default-cluster"  #Change to preffered cluster name

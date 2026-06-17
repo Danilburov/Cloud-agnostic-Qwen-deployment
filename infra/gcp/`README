@@ -1,0 +1,367 @@
+# Self-Hosted LLM Deployment on GCP using Terraform, GKE, and KServe
+
+## Overview
+
+This project deploys a self-hosted Large Language Model (LLM) on Google Cloud Platform using Terraform, Google Kubernetes Engine (GKE), KServe, and vLLM.
+
+The deployment process is fully automated and consists of:
+
+1. Infrastructure deployment
+2. Kubernetes cluster deployment
+3. KServe installation
+4. Model upload and deployment
+5. OpenAI-compatible API exposure
+
+The solution has been tested with:
+
+* TinyLlama-1.1B-Chat
+* Qwen2.5-0.5B
+
+---
+
+# Prerequisites
+
+Install the following software before starting:
+
+## Terraform
+
+Verify installation:
+
+```bash
+terraform version
+```
+
+Recommended version: 1.5+
+
+---
+
+## Google Cloud SDK
+
+Verify installation:
+
+```bash
+gcloud version
+```
+
+---
+
+## Kubectl
+
+Verify installation:
+
+```bash
+kubectl version --client
+```
+
+---
+
+## Git
+
+Verify installation:
+
+```bash
+git --version
+```
+
+---
+
+# Google Cloud Requirements
+
+The deployment account requires sufficient permissions to create and manage:
+
+* VPC Networks
+* Firewalls
+* Service Accounts
+* GKE Clusters
+* Cloud Storage Buckets
+* IAM Bindings
+
+Recommended role:
+
+* Project Owner
+
+---
+
+# Authentication
+
+Login to Google Cloud:
+
+```bash
+gcloud auth login
+```
+
+Set the active project:
+
+```bash
+gcloud config set project PROJECT_ID
+```
+
+Verify:
+
+```bash
+gcloud config list
+```
+
+---
+
+## Required Variables
+
+Create a file named `terraform.tfvars` in the root deployment directory.
+
+Example:
+
+```hcl
+# Google Cloud Organization ID
+org_id = "123456789012"
+
+# Billing Account ID
+billing_account = "AAAAAA-BBBBBB-CCCCCC"
+
+# Project Configuration
+project_id   = "my-gcp-project"
+project_name = "My GCP Project"
+
+# Deployment Region
+region = "us-central1"
+
+# Existing project used for Terraform bootstrapping/state management
+bootstrap_project = "terraform-bootstrap"
+
+# GKE Node Configuration
+machine_type = "e2-standard-2"
+
+# Kubernetes Cluster Name
+cluster_name = "sue-cluster"
+```
+
+### Variable Description
+
+| Variable          | Description                                                 |
+| ----------------- | ----------------------------------------------------------- |
+| org_id            | Google Cloud Organization ID                                |
+| billing_account   | Billing account used for project billing                    |
+| project_id        | Google Cloud project ID                                     |
+| project_name      | Display name of the GCP project                             |
+| region            | GCP region where resources will be deployed                 |
+| bootstrap_project | Existing project used for Terraform state and bootstrapping |
+| machine_type      | Machine type for GKE nodes                                  |
+| cluster_name      | Name of the Kubernetes cluster                              |
+
+### Example Used During Testing
+
+```hcl
+project_id   = "sue-project-dev-6992"
+project_name = "SUE Project Dev"
+
+region = "us-south1"
+
+machine_type = "e2-standard-2"
+
+cluster_name = "sue-cluster"
+```
+
+> Do not commit real Organization IDs, Billing Account IDs, service account credentials, or other sensitive information to version control.
+
+---
+
+# Model Upload
+
+Create a bucket:
+
+```bash
+gcloud storage buckets create gs://PROJECT_ID-models
+```
+
+Upload the model files:
+
+```bash
+gcloud storage cp -r ./model-folder gs://PROJECT_ID-models/
+```
+
+Example:
+
+```bash
+gcloud storage cp -r tinyllama gs://PROJECT_ID-models/
+```
+
+Verify upload:
+
+```bash
+gcloud storage ls gs://PROJECT_ID-models/tinyllama/
+```
+
+---
+
+# Deployment
+
+## Automated Deployment
+
+Run the deployment script:
+
+```powershell
+.\deploy.ps1
+```
+
+The script automatically executes all deployment phases.
+
+---
+
+
+# Verifying the Deployment
+
+Check cluster nodes:
+
+```bash
+kubectl get nodes
+```
+
+Check KServe:
+
+```bash
+kubectl get pods -n kserve
+```
+
+Check deployed model:
+
+```bash
+kubectl get inferenceservice -n llm
+```
+
+Expected result:
+
+```text
+READY=True
+```
+
+Check pod status:
+
+```bash
+kubectl get pods -n llm
+```
+
+Expected result:
+
+```text
+1/1 Running
+```
+
+---
+
+# Testing the Model
+
+Port forward the service:
+
+```bash
+kubectl port-forward svc/tiny-llama-predictor 8080:80 -n llm
+```
+
+List available models:
+
+```bash
+curl http://localhost:8080/openai/v1/models
+```
+
+Expected output:
+
+```json
+{
+  "models": ["tiny-llama"]
+}
+```
+
+Run a test prompt:
+
+```bash
+curl -X POST http://localhost:8080/openai/v1/chat/completions ^
+-H "Content-Type: application/json" ^
+-d "{\"model\":\"tiny-llama\",\"messages\":[{\"role\":\"user\",\"content\":\"Explain Kubernetes in one sentence\"}]}"
+```
+
+---
+
+# Common Issues
+
+## Workload Identity Errors
+
+Verify Kubernetes Service Account:
+
+```bash
+kubectl get sa kserve-sa -n llm -o yaml
+```
+
+Verify IAM binding:
+
+```bash
+gcloud iam service-accounts get-iam-policy SERVICE_ACCOUNT
+```
+
+---
+
+## Model Not Found
+
+Verify the model exists inside the bucket:
+
+```bash
+gcloud storage ls gs://PROJECT_ID-models/MODEL_NAME/
+```
+
+Ensure the storageUri exactly matches the uploaded folder name.
+
+---
+
+## Pod Pending
+
+Check scheduling issues:
+
+```bash
+kubectl describe pod POD_NAME -n llm
+```
+
+Typical causes:
+
+* Insufficient CPU
+* Insufficient Memory
+* GCP Quota Limits
+
+---
+
+## Pod OOMKilled
+
+Increase node resources or use a smaller model.
+
+Examples:
+
+* TinyLlama-1.1B-Chat
+* Qwen2.5-0.5B
+
+---
+
+# Cleanup
+
+Destroy all deployed resources:
+
+```powershell
+.\destroy.ps1
+```
+
+Or manually:
+
+```bash
+terraform destroy
+```
+
+---
+
+# Tested Models
+
+| Model               | Status                         |
+| ------------------- | ------------------------------ |
+| TinyLlama-1.1B-Chat | Working                        |
+| Qwen2.5-0.5B        | Working                        |
+| Larger Models       | Depends on available resources |
+
+---
+
+# Project Outcome
+
+The deployment provisions infrastructure, installs Kubernetes and KServe, deploys a self-hosted LLM, and exposes an OpenAI-compatible API endpoint that can be consumed by applications and benchmarking tools.
