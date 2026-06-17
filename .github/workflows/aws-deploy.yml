@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - AWS
 
 permissions:
   id-token: write
@@ -27,18 +27,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION || 'eu-central-1' }}
-        
-          #A check to see if the pipeline read the secrets
-      - name: Verify cluster admins secret
-        run: |
-          echo "TF_VAR_cluster_admins length: ${#TF_VAR_cluster_admins}"
-          if [ -z "$TF_VAR_cluster_admins" ]; then
-          echo "ERROR: TF_VAR_cluster_admins is empty or not set"
-            exit 1
-          fi
-          echo "Secret is set, proceeding..."
-        env:
-          TF_VAR_cluster_admins: ${{secrets.TF_VAR_cluster_admins}}
   
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
@@ -163,3 +151,20 @@ jobs:
             -l serving.kserve.io/inferenceservice=qwen \
             -n default \
             --timeout=600s
+
+    #eks creates its own load balancer on provisioning,
+    #but KServe creates a NodePort service by default. 
+    #To expose the Qwen predictor externally, 
+    #we need to patch the service to change its type to LoadBalancer. 
+    #This will allow us to access the model from outside the cluster.
+      - name: Expose Qwen via LoadBalancer
+        run: |
+          kubectl patch service qwen-predictor -n default \
+            -p '{"spec": {"type": "LoadBalancer"}}'
+
+      - name: Print Qwen endpoint
+        run: |
+          sleep 30
+          HOSTNAME=$(kubectl get service qwen-predictor -n default \
+          -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "http://$HOSTNAME/openai/v1/chat/completions"
