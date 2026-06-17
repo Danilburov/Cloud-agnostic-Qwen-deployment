@@ -1,0 +1,226 @@
+"Label","Prompt","EKS_Model","EKS_Instance","EKS_Answer","EKS_Latency_ms","EKS_InputTokens","EKS_OutputTokens","EKS_TotalTokens","EKS_CostPerRequest","Bedrock_Model","Bedrock_Answer","Bedrock_Latency_ms","Bedrock_ApiLatency_ms","Bedrock_InputTokens","Bedrock_OutputTokens","Bedrock_TotalTokens","Bedrock_CostPerRequest"
+"Simple COBOL to Python","Convert this COBOL code to Python: IDENTIFICATION DIVISION. PROGRAM-ID. HELLO. PROCEDURE DIVISION. DISPLAY 'Hello World'. STOP RUN.","Qwen2.5-0.5B","t3.2xlarge","ERROR","-1","0","0","0","0","Qwen3-32B","Here's the equivalent Python code for the given COBOL program:
+
+```python
+# Equivalent of the COBOL program ID
+print('Hello World')
+```
+
+### Explanation:
+
+- `IDENTIFICATION DIVISION. PROGRAM-ID. HELLO.`  
+  This defines the name of the program (`HELLO`). In Python, we don't usually define program IDs explicitly, but the script itself is the equivalent.
+
+- `PROCEDURE DIVISION.`  
+  Marks the start of the executable instructions. In Python, the code starts executing top to bottom.
+
+- `DISPLAY 'Hello World'.`  
+  In COBOL, `DISPLAY` is used to print output. In Python, `print()` is used for the same purpose.
+
+- `STOP RUN.`  
+  Terminates the COBOL program. In Python, the program ends naturally after the last line. No explicit `STOP` is needed unless using specific control structures (like `sys.exit()`).","1629","1100","45","195","240","0.000255"
+"Refactor unreadable Java","Refactor this Java code to be more readable, add proper variable names and comments: for(int i=0;i<arr.length;i++){if(arr[i]%2==0){sum+=arr[i];}}","Qwen2.5-0.5B","t3.2xlarge","ERROR","-1","0","0","0","0","Qwen3-32B","Certainly! Here's your refactored Java code with improved readability, meaningful variable names, and added comments:
+
+```java
+// Initialize a variable to hold the sum of even numbers
+int sumOfEvens = 0;
+
+// Loop through each element in the array
+for (int index = 0; index < arr.length; index++) {
+    int currentNumber = arr[index];
+
+    // Check if the current number is even
+    if (currentNumber % 2 == 0) {
+        // Add it to the sum if it is
+        sumOfEvens += currentNumber;
+    }
+}
+```
+
+### Summary of Improvements:
+- **Variable Name**: Changed `sum` to `sumOfEvens` for clarity.
+- **Index Variable Name**: Changed `i` to `index` for more meaningful naming.
+- **Temporary Variable**: Introduced `currentNumber` for better readability.
+- **Added Comments**: To explain the purpose of each section, making it easier to understand at a glance.","1706","1188","54","208","262","0.000274"
+"BASIC to Python","Convert this BASIC code to clean Python with proper variable names and comments: 010 LET X=0\n020 FOR I=1 TO 10\n030 LET X=X+I\n040 NEXT I\n050 PRINT X\n060 END","Qwen2.5-0.5B","t3.2xlarge","ERROR","-1","0","0","0","0","Qwen3-32B","Sure! Here's the conversion of the given BASIC code into a clean and well-commented Python script with appropriate variable names:
+
+```python
+# Initialize the sum variable to 0
+total = 0
+
+# Loop from 1 to 10 (inclusive)
+for number in range(1, 11):
+    # Add the current number to the total
+    total += number
+
+# Print the resulting sum
+print(total)
+```
+
+### Explanation:
+- `X` in BASIC is renamed to `total` in Python to better reflect its purpose.
+- `I` is renamed to `number` for clarity.
+- `FOR I=1 TO 10` translates to `for number in range(1, 11)`, because Python's `range` is exclusive of the upper limit.
+- The `PRINT X` line is replaced with `print(total)`.
+- No need for an `END` in Python.
+
+This script calculates the sum of numbers from 1 to 10 and prints the result (which is 55).","1358","851","72","218","290","0.00029"
+"Complex COBOL to Python","Convert this COBOL code to clean Python with proper variable names, functions and comments: IDENTIFICATION DIVISION. PROGRAM-ID. CALCULATE-TAX. DATA DIVISION. WORKING-STORAGE SECTION. 01 SALARY PIC 9(7)V99. 01 TAX-RATE PIC 9V99. 01 TAX-AMOUNT PIC 9(7)V99. PROCEDURE DIVISION. COMPUTE TAX-AMOUNT = SALARY * TAX-RATE. DISPLAY TAX-AMOUNT. STOP RUN.","Qwen2.5-0.5B","t3.2xlarge","ERROR","-1","0","0","0","0","Qwen3-32B","Sure! Below is a **clean and well-documented Python** version of the given **COBOL code**, with:
+
+- Proper variable names  
+- Comments explaining each step  
+- Use of functions for better structure  
+- Type hints and clean formatting  
+
+---
+
+### 🧾 COBOL Code (Original)
+```cobol
+IDENTIFICATION DIVISION.
+PROGRAM-ID. CALCULATE-TAX.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 SALARY            PIC 9(7)V99.
+01 TAX-RATE          PIC 9V99.
+01 TAX-AMOUNT        PIC 9(7)V99.
+PROCEDURE DIVISION.
+    COMPUTE TAX-AMOUNT = SALARY * TAX-RATE.
+    DISPLAY TAX-AMOUNT.
+    STOP RUN.
+```
+
+---
+
+### 🐍 Clean Python Version
+
+```python
+def calculate_tax(salary: float, tax_rate: float) -> float:
+    """"""
+    Calculate the tax amount based on a given salary and tax rate.
+    
+    Parameters:
+    - salary (float): The income on which tax is computed.
+    - tax_rate (float): The tax rate to apply (as a decimal, e.g., 0.15 for 15%).
+    
+    Returns:
+    - float: The calculated tax amount.
+    """"""
+    return salary * tax_rate
+
+
+def main():
+    """"""
+    Main function to gather user input, calculate tax, and display the result.
+    Simulates the behavior of the original COBOL program.
+    """"""
+    # In a real scenario, this would come from user input or a file/dataset
+    salary = 75000.0  # Example salary
+    tax_rate = 0.15   # Example tax rate (15%)
+
+    # Calculate tax using the defined function
+    tax_amount = calculate_tax(salary, tax_rate)
+
+    # Display the result (similar to DISPLAY in COBOL)
+    print(f""Calculated Tax Amount: ${tax_amount:,.2f}"")
+
+
+if __name__ == ""__main__"":
+    main()
+```
+
+---
+
+### ✅ Explanation
+
+| COBOL Element           | Python Equivalent                            | Note                                         |
+|------------------------|-----------------------------------------------|----------------------------------------------|
+| `SALARY`               | `salary: float`                               | Salary on which tax is applied               |
+| `TAX-RATE`             | `tax_rate: float`                             | Tax rate (as a decimal like 0.15 for 15%)    |
+| `TAX-AMOUNT`           | `tax_amount = salary * tax_rate`              | Tax is computed as the product               |
+| `DISPLAY TAX-AMOUNT`   | `print(...)`                                  | Simulates output in Python (to console)      |
+| `PROCEDURE DIVISION`   | `def main()`, `def calculate_tax(...)`        | Functions to encapsulate logic               |
+| `STOP RUN`             | `if __name__ == ""__main__"": main()`           | Ensures code runs when script is executed    |
+
+---
+
+### 🧪 Example Output
+If you run the Python code with the example values (`$75,000` salary and 15% tax):
+
+```
+Calculated Tax Amount: $11,250.00
+```
+
+---
+
+Let me know if you want to make this interactive or add data validation!","8308","7774","124","713","837","0.000922"
+"Legacy C to Python","Convert this legacy C code to modern Python with proper error handling and comments: #include<stdio.h> int main(){int a[5]={1,2,3,4,5};int sum=0;int i;for(i=0;i<5;i++){sum=sum+a[i];}printf('%d',sum);return 0;}","Qwen2.5-0.5B","t3.2xlarge","ERROR","-1","0","0","0","0","Qwen3-32B","Certainly! Here's the **modern Python** version of the given C code, complete with **comments** and **proper error handling**:
+
+---
+
+### 🔄 **Original C Code**
+```c
+#include<stdio.h>
+
+int main() {
+    int a[5] = {1, 2, 3, 4, 5};
+    int sum = 0;
+    int i;
+    for (i = 0; i < 5; i++) {
+        sum = sum + a[i];
+    }
+    printf(""%d"", sum);
+    return 0;
+}
+```
+
+### ✅ **Modern Python Equivalent**
+
+```python
+# Python version of the given C code
+# Compute the sum of a list of integers
+
+def main():
+    """"""
+    Main function to calculate and print the sum of a predefined list of integers.
+    """"""
+    # Initialize a list of integers (equivalent to array in C)
+    a = [1, 2, 3, 4, 5]
+    
+    # Initialize sum to 0
+    total_sum = 0
+
+    try:
+        # Loop through the list to calculate the sum
+        for number in a:
+            total_sum += number
+
+        # Print the result
+        print(total_sum)
+
+    except Exception as e:
+        # Handle any unexpected errors during the computation
+        print(f""An error occurred: {e}"")
+
+# Check if this script is being run directly
+if __name__ == ""__main__"":
+    main()
+```
+
+---
+
+### 📌 **Key Features Added**
+
+- ✅ **Error handling** using a `try-except` block to catch runtime issues.
+- ✅ **Function-based structure** (encapsulated in `main()`), a common Python best practice.
+- ✅ **Proper comments** for clarity and documentation.
+- ✅ **Use of more descriptive variable name** (`total_sum` instead of just `sum`, if needed).
+- ✅ **Check for direct execution** via `if __name__ == ""__main__""`.
+
+---
+
+### 🧪 **Expected Output**
+```
+15
+```
+
+Let me know if you need to generalize this (e.g. accept input, handle user-defined sizes, etc.)!","4700","4183","83","463","546","0.0006"

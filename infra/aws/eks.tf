@@ -84,7 +84,7 @@ resource "aws_eks_node_group" "sue_eks_nodes" {
     aws_subnet.sue-subnet-private-1.id,
     aws_subnet.sue-subnet-private-2.id
   ]
-  instance_types = ["r5.4xlarge"] //CPU based instance type, would be great to test it with GPU
+  instance_types = ["m5.4xlarge"] //CPU based instance type, would be great to test it with GPU
   ami_type       = "AL2_x86_64"
   disk_size      = 50
   scaling_config {
@@ -151,8 +151,8 @@ output "cluster_name" {
 # }
 
 //new approach since the pipeline is failing since I changed the code
-//with this code I am trying to ensure that all the team members can access the cluster
-
+//with this code I am trying to ensure that all the team members can 
+//access the cluster
 resource "aws_eks_access_entry" "admin_users" {
   for_each = { for user in var.cluster_admins : user.username => user }
 
